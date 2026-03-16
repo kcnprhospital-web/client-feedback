@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>វាយតម្លៃសេវាកម្ម - មន្ទីរពេទ្យខេត្តកំពង់ឆ្នាំង</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@300;400;500;600;700&family=Noto+Sans+Khmer:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #1a5f8a;
+    --primary-light: #2980b9;
+    --primary-dark: #0d3d5e;
+    --accent: #e8a020;
+    --accent-light: #f5c842;
+    --success: #27ae60;
+    --danger: #e74c3c;
+    --bg: #f0f6fc;
+    --card: #ffffff;
+    --text: #1a2a3a;
+    --text-muted: #5a7a90;
+    --border: #d0e4f0;
+    --shadow: 0 4px 24px rgba(26,95,138,0.10);
+    --radius: 18px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Kantumruy Pro', 'Noto Sans Khmer', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding-bottom: 40px;
+  }
+
+  /* HEADER */
+  .header {
+    background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 60%, var(--primary-light) 100%);
+    padding: 28px 20px 70px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    top: -40px; right: -40px;
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.06);
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: -30px; left: -30px;
+    width: 150px; height: 150px;
+    border-radius: 50%;
+    background: rgba(232,160,32,0.15);
+  }
+  .hospital-logo {
+    width: 70px; height: 70px;
+    background: white;
+    border-radius: 50%;
+    margin: 0 auto 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 32px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    position: relative; z-index: 1;
+  }
+  .header h1 {
+    font-size: 1.3rem; font-weight: 700;
+    color: white; line-height: 1.5;
+    position: relative; z-index: 1;
+  }
+  .header p {
+    color: rgba(255,255,255,0.8);
+    font-size: 0.85rem; margin-top: 6px;
+    position: relative; z-index: 1;
+  }
+
+  /* WAVE */
+  .wave-divider {
+    margin-top: -2px;
+    background: var(--primary-light);
+    position: relative;
+  }
+  .wave-divider svg { display: block; }
+
+  /* MAIN CARD AREA */
+  .container {
+    max-width: 520px;
+    margin: -45px auto 0;
+    padding: 0 16px;
+    position: relative; z-index: 10;
+  }
+
+  .step-card {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 28px 24px;
+    box-shadow: var(--shadow);
+    margin-bottom: 16px;
+    border: 1px solid var(--border);
+    animation: slideUp 0.4s ease both;
+  }
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .step-label {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 16px;
+  }
+  .step-num {
+    width: 30px; height: 30px;
+    background: var(--primary);
+    color: white;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.85rem; font-weight: 700;
+    flex-shrink: 0;
+  }
+  .step-title {
+    font-size: 1rem; font-weight: 600; color: var(--primary-dark);
+  }
+
+  /* TYPE SELECTOR */
+  .type-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+  }
+  .type-btn {
+    padding: 16px 12px;
+    border: 2px solid var(--border);
+    border-radius: 14px;
+    background: white;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s;
+    font-family: inherit;
+  }
+  .type-btn:hover { border-color: var(--primary-light); background: #f0f8ff; }
+  .type-btn.active {
+    border-color: var(--primary);
+    background: linear-gradient(135deg, #e8f4fd, #dbeef9);
+    box-shadow: 0 2px 12px rgba(26,95,138,0.15);
+  }
+  .type-btn .icon { font-size: 28px; display: block; margin-bottom: 6px; }
+  .type-btn .label { font-size: 0.82rem; font-weight: 600; color: var(--primary-dark); line-height: 1.4; }
+
+  /* SELECT DROPDOWN */
+  .select-wrap { position: relative; }
+  .select-wrap select {
+    width: 100%;
+    padding: 14px 44px 14px 16px;
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    font-family: inherit;
+    font-size: 0.9rem;
+    color: var(--text);
+    background: white;
+    appearance: none;
+    cursor: pointer;
+    transition: border-color 0.2s;
+    outline: none;
+  }
+  .select-wrap select:focus { border-color: var(--primary); }
+  .select-wrap::after {
+    content: '▾';
+    position: absolute; right: 16px; top: 50%;
+    transform: translateY(-50%);
+    color: var(--primary); pointer-events: none;
+    font-size: 1rem;
+  }
+
+  /* RATING GRID */
+  .rating-group {
+    margin-bottom: 20px;
+    padding: 16px;
+    background: #f8fbff;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+  }
+  .rating-group-title {
+    font-size: 0.88rem; font-weight: 600;
+    color: var(--primary-dark);
+    margin-bottom: 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .rating-group-title .icon { font-size: 18px; }
+
+  .star-row {
+    display: flex; justify-content: center; gap: 8px;
+  }
+  .star-btn {
+    background: none; border: none; cursor: pointer;
+    font-size: 32px; line-height: 1;
+    transition: transform 0.15s;
+    padding: 2px;
+    color: #d0d8e0;
+  }
+  .star-btn:hover { transform: scale(1.2); }
+  .star-btn.filled { color: var(--accent); }
+  .star-btn.filled:hover { color: var(--accent-light); }
+
+  .rating-label {
+    text-align: center;
+    font-size: 0.78rem; color: var(--text-muted);
+    margin-top: 6px;
+    min-height: 18px;
+    transition: all 0.2s;
+  }
+
+  /* COMMENT */
+  .comment-input {
+    width: 100%; padding: 14px 16px;
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    font-family: inherit; font-size: 0.88rem;
+    resize: vertical; min-height: 90px;
+    outline: none; transition: border-color 0.2s;
+    color: var(--text);
+  }
+  .comment-input:focus { border-color: var(--primary); }
+  .comment-input::placeholder { color: #aabcc8; }
+
+  /* SUBMIT BTN */
+  .submit-btn {
+    width: 100%; padding: 17px;
+    background: linear-gradient(135deg, var(--primary), var(--primary-light));
+    color: white; border: none;
+    border-radius: 14px;
+    font-family: inherit; font-size: 1rem; font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 6px 20px rgba(26,95,138,0.3);
+    letter-spacing: 0.5px;
+  }
+  .submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 28px rgba(26,95,138,0.4);
+  }
+  .submit-btn:active { transform: translateY(0); }
+  .submit-btn:disabled {
+    opacity: 0.6; cursor: not-allowed;
+    transform: none; box-shadow: none;
+  }
+
+  /* SUCCESS SCREEN */
+  .success-screen {
+    display: none;
+    text-align: center;
+    padding: 40px 24px;
+  }
+  .success-screen.show { display: block; animation: slideUp 0.5s ease; }
+  .success-icon {
+    width: 90px; height: 90px;
+    background: linear-gradient(135deg, #27ae60, #2ecc71);
+    border-radius: 50%;
+    margin: 0 auto 20px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 44px;
+    box-shadow: 0 8px 24px rgba(39,174,96,0.3);
+  }
+  .success-screen h2 {
+    font-size: 1.4rem; font-weight: 700;
+    color: var(--primary-dark); margin-bottom: 10px;
+  }
+  .success-screen p { color: var(--text-muted); font-size: 0.9rem; line-height: 1.7; }
+  .new-feedback-btn {
+    margin-top: 24px;
+    padding: 14px 36px;
+    background: var(--primary);
+    color: white; border: none;
+    border-radius: 12px;
+    font-family: inherit; font-size: 0.9rem; font-weight: 600;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .new-feedback-btn:hover { background: var(--primary-dark); }
+
+  /* INFO BAR */
+  .info-bar {
+    background: linear-gradient(135deg, #fff8e8, #fef3cd);
+    border: 1px solid #f5c842;
+    border-radius: 12px;
+    padding: 12px 16px;
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 16px;
+    font-size: 0.82rem; color: #7a5a00;
+  }
+
+  /* LOADING OVERLAY */
+  .loading-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 999;
+    align-items: center; justify-content: center;
+  }
+  .loading-overlay.show { display: flex; }
+  .loading-box {
+    background: white; border-radius: 18px;
+    padding: 32px 40px; text-align: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  }
+  .spinner {
+    width: 48px; height: 48px;
+    border: 4px solid var(--border);
+    border-top-color: var(--primary);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 16px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* FOOTER */
+  .footer {
+    text-align: center;
+    padding: 20px;
+    color: var(--text-muted);
+    font-size: 0.78rem;
+  }
+
+  /* Responsive */
+  @media (max-width: 380px) {
+    .star-btn { font-size: 28px; }
+    .step-card { padding: 20px 16px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="hospital-logo">🏥</div>
+  <h1>មន្ទីរពេទ្យខេត្តកំពង់ឆ្នាំង<br>Kampong Chhnang Provincial Hospital</h1>
+  <p>📋 សូមផ្តល់មតិយោបល់ដើម្បីលើកកម្ពស់គុណភាពសេវាកម្ម</p>
+</div>
+
+<div class="container">
+
+  <!-- INFO BAR -->
+  <div class="info-bar">
+    🔒 ព័ត៌មានរបស់អ្នករក្សាជាការសម្ងាត់ · ប្រើពេលតិចជាង ៣ នាទី
+  </div>
+
+  <!-- MAIN FORM -->
+  <div id="formSection">
+
+    <!-- STEP 1: DEPARTMENT TYPE -->
+    <div class="step-card" style="animation-delay:0.05s">
+      <div class="step-label">
+        <div class="step-num">១</div>
+        <div class="step-title">ជ្រើសរើសប្រភេទសេវាកម្ម</div>
+      </div>
+      <div class="type-grid">
+        <button class="type-btn active" onclick="selectType('care')" id="btn-care">
+          <span class="icon">🩺</span>
+          <span class="label">ការថែទាំព្យាបាល<br><small style="font-weight:400;color:#888">Care Delivery</small></span>
+        </button>
+        <button class="type-btn" onclick="selectType('support')" id="btn-support">
+          <span class="icon">🔬</span>
+          <span class="label">សេវាជំនួយ<br><small style="font-weight:400;color:#888">Support Service</small></span>
+        </button>
+      </div>
+    </div>
+
+    <!-- STEP 2: DEPARTMENT -->
+    <div class="step-card" style="animation-delay:0.1s">
+      <div class="step-label">
+        <div class="step-num">២</div>
+        <div class="step-title">ជ្រើសរើសផ្នែក / Department</div>
+      </div>
+      <div class="select-wrap">
+        <select id="departmentSelect" onchange="onDeptChange()">
+          <option value="">-- សូមជ្រើសរើសផ្នែក --</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- STEP 3: RATINGS -->
+    <div class="step-card" id="ratingsCard" style="animation-delay:0.15s">
+      <div class="step-label">
+        <div class="step-num">៣</div>
+        <div class="step-title">វាយតម្លៃសេវាកម្ម (ចុចផ្កាយ ១–៥)</div>
+      </div>
+      <div id="ratingsContainer"></div>
+    </div>
+
+    <!-- STEP 4: COMMENT -->
+    <div class="step-card" style="animation-delay:0.2s">
+      <div class="step-label">
+        <div class="step-num">៤</div>
+        <div class="step-title">យោបល់បន្ថែម (ស្រេចចិត្ត)</div>
+      </div>
+      <textarea class="comment-input" id="commentInput"
+        placeholder="សូមចែករំលែកបទពិសោធន៍របស់អ្នក..."></textarea>
+    </div>
+
+    <!-- SUBMIT -->
+    <button class="submit-btn" id="submitBtn" onclick="submitFeedback()">
+      ✅ &nbsp;ផ្ញើមតិយោបល់
+    </button>
+
+  </div>
+
+  <!-- SUCCESS SCREEN -->
+  <div class="step-card success-screen" id="successScreen">
+    <div class="success-icon">✓</div>
+    <h2>អរគុណសម្រាប់មតិយោបល់!</h2>
+    <p>យើងបានទទួលមតិយោបល់របស់អ្នករួចហើយ។<br>
+    អ្នកបានជួយយើងក្នុងការលើកកម្ពស់<br>គុណភាពសេវាកម្មមន្ទីរពេទ្យ។</p>
+    <p style="margin-top:12px;font-size:0.82rem;color:#27ae60;font-weight:600">
+      ✨ មតិរបស់អ្នកមានតម្លៃមិនអាចប្រៀបបាន
+    </p>
+    <button class="new-feedback-btn" onclick="resetForm()">
+      🔄 ផ្តល់មតិថ្មីទៀត
+    </button>
+  </div>
+
+  <div class="footer">
+    © ២០២៦ · មន្ទីរពេទ្យខេត្តកំពង់ឆ្នាំង · KCPH Quality Improvement
+  </div>
+</div>
+
+<!-- LOADING OVERLAY -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-box">
+    <div class="spinner"></div>
+    <p style="color:#1a5f8a;font-weight:600">កំពុងផ្ញើ...</p>
+  </div>
+</div>
+
+<script>
+// ==================== CONFIG ====================
+// Replace with your Google Apps Script Web App URL
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec';
+
+// ==================== DATA ====================
+const DEPARTMENTS = {
+  care: [
+    { value: 'OPD', label: 'OPD / ពិគ្រោះជំងឺក្រៅ' },
+    { value: 'Emergency', label: 'Emergency / សង្គ្រោះបន្ទាន់' },
+    { value: 'ICU', label: 'ICU / សង្គ្រោះបន្ទាន់កម្រិតធ្ងន់' },
+    { value: 'General Medicine', label: 'General Medicine / ជំងឺទូទៅ' },
+    { value: 'Trauma-Surgery A', label: 'Trauma-Surgery A / របួសសល្យសាស្ត្រ ក' },
+    { value: 'Trauma-Surgery B', label: 'Trauma-Surgery B / របួសសល្យសាស្ត្រ ខ' },
+    { value: 'Operation Theater', label: 'Operation Theater / សល្យាគារ' },
+    { value: 'Gynecology', label: 'Gynecology / រោគស្ត្រី' },
+    { value: 'Maternity', label: 'Maternity / សម្ភព' },
+    { value: 'Pediatry', label: 'Pediatry / ជំងឺកុមារ' },
+    { value: 'NCU', label: 'NCU / ថែទាំទារក' },
+    { value: 'Eye Unit', label: 'Eye Unit / ចក្ខុរោគ' },
+    { value: 'Dialysis', label: 'Dialysis / លាងឈាម' },
+  ],
+  support: [
+    { value: 'Laboratory', label: 'Laboratory / មន្ទីរពិសោធន៍' },
+    { value: 'Blood Bank', label: 'Blood Bank / ផ្តល់ឈាម' },
+    { value: 'Radiology', label: 'Radiology / វិទ្យុសាស្ត្រ' },
+    { value: 'Ultrasound', label: 'Ultrasound / អេកូសាស្ត្រ' },
+    { value: 'PMRS', label: 'PMRS / កន្លែងចុះឈ្មោះនិងធ្វើឯកសារ' },
+    { value: 'Cashier', label: 'Cashier / បញ្ជរបង់លុយ' },
+    { value: 'Pharmacy', label: 'Pharmacy / ឱសថស្ថាន' },
+  ]
+};
+
+// Care delivery questions
+const CARE_QUESTIONS = [
+  { key: 'care_delivery', icon: '🩺', label: 'ការផ្តល់សេវាព្យាបាល\nCare Delivery' },
+  { key: 'waiting_time', icon: '⏱️', label: 'ពេលវេលារង់ចាំ\nWaiting Time' },
+  { key: 'counseling', icon: '💬', label: 'ការពន្យល់និងការណែនាំ\nExplaining & Counseling' },
+  { key: 'env_sanitation', icon: '🏥', label: 'អនាម័យបរិស្ថាន\nEnvironmental Sanitation' },
+  { key: 'hospitality', icon: '🤝', label: 'ភាពរួសរាយរាក់ទាក់\nHospitality' },
+  { key: 'wc_sanitation', icon: '🚻', label: 'អនាម័យបន្ទប់ទឹក\nW.C Sanitation' },
+];
+
+// Support service questions (5 specific)
+const SUPPORT_QUESTIONS = [
+  { key: 'service_speed', icon: '⚡', label: 'ល្បឿននៃការផ្តល់សេវា\nService Speed' },
+  { key: 'staff_manner', icon: '😊', label: 'ចរិយាបុគ្គលិក\nStaff Manner' },
+  { key: 'explanation', icon: '📋', label: 'ការពន្យល់លទ្ធផល\nResult Explanation' },
+  { key: 'env_sanitation', icon: '✨', label: 'អនាម័យបរិស្ថាន\nEnvironmental Sanitation' },
+  { key: 'overall_service', icon: '⭐', label: 'ការវាយតម្លៃទូទៅ\nOverall Service' },
+];
+
+const STAR_LABELS = ['', '😞 ខ្សោយ', '😐 ចាំបាច់កែ', '🙂 ល្អ', '😊 ល្អណាស់', '😄 ល្អឥតខ្ចោះ'];
+
+// ==================== STATE ====================
+let currentType = 'care';
+let currentDept = '';
+let ratings = {};
+
+// ==================== INIT ====================
+function init() {
+  populateDepts('care');
+  renderRatings('care');
+}
+
+function selectType(type) {
+  currentType = type;
+  ratings = {};
+  document.getElementById('btn-care').classList.toggle('active', type === 'care');
+  document.getElementById('btn-support').classList.toggle('active', type === 'support');
+  populateDepts(type);
+  renderRatings(type);
+  document.getElementById('departmentSelect').value = '';
+  currentDept = '';
+}
+
+function populateDepts(type) {
+  const sel = document.getElementById('departmentSelect');
+  sel.innerHTML = '<option value="">-- សូមជ្រើសរើសផ្នែក --</option>';
+  DEPARTMENTS[type].forEach(d => {
+    const opt = document.createElement('option');
+    opt.value = d.value;
+    opt.textContent = d.label;
+    sel.appendChild(opt);
+  });
+}
+
+function onDeptChange() {
+  currentDept = document.getElementById('departmentSelect').value;
+}
+
+function renderRatings(type) {
+  const questions = type === 'care' ? CARE_QUESTIONS : SUPPORT_QUESTIONS;
+  const container = document.getElementById('ratingsContainer');
+  container.innerHTML = '';
+  questions.forEach(q => {
+    ratings[q.key] = 0;
+    const lines = q.label.split('\n');
+    container.innerHTML += `
+      <div class="rating-group" id="group-${q.key}">
+        <div class="rating-group-title">
+          <span class="icon">${q.icon}</span>
+          <span>${lines[0]}<br><small style="font-weight:400;color:#7a9ab0">${lines[1] || ''}</small></span>
+        </div>
+        <div class="star-row" id="stars-${q.key}">
+          ${[1,2,3,4,5].map(i => `
+            <button class="star-btn" data-key="${q.key}" data-val="${i}" onclick="setRating('${q.key}',${i})">★</button>
+          `).join('')}
+        </div>
+        <div class="rating-label" id="label-${q.key}">សូមជ្រើសរើសការវាយតម្លៃ</div>
+      </div>`;
+  });
+}
+
+function setRating(key, val) {
+  ratings[key] = val;
+  const stars = document.querySelectorAll(`#stars-${key} .star-btn`);
+  stars.forEach((s, i) => {
+    s.classList.toggle('filled', i < val);
+  });
+  document.getElementById(`label-${key}`).textContent = STAR_LABELS[val];
+  document.getElementById(`group-${key}`).style.background = '#f0faf4';
+  document.getElementById(`group-${key}`).style.borderColor = '#27ae60';
+}
+
+// ==================== SUBMIT ====================
+async function submitFeedback() {
+  if (!currentDept) {
+    alert('សូមជ្រើសរើសផ្នែក!');
+    return;
+  }
+  const questions = currentType === 'care' ? CARE_QUESTIONS : SUPPORT_QUESTIONS;
+  const unanswered = questions.filter(q => !ratings[q.key]);
+  if (unanswered.length > 0) {
+    alert('សូមវាយតម្លៃប្រធានបទទាំងអស់!');
+    return;
+  }
+
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  document.getElementById('loadingOverlay').classList.add('show');
+
+  const payload = {
+    timestamp: new Date().toISOString(),
+    type: currentType,
+    department: currentDept,
+    ratings: ratings,
+    comment: document.getElementById('commentInput').value.trim(),
+    avgScore: (Object.values(ratings).reduce((a,b) => a+b, 0) / Object.values(ratings).length).toFixed(2)
+  };
+
+  try {
+    await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    showSuccess();
+  } catch (err) {
+    // With no-cors, fetch always "succeeds" - treat as success
+    showSuccess();
+  }
+}
+
+function showSuccess() {
+  document.getElementById('loadingOverlay').classList.remove('show');
+  document.getElementById('formSection').style.display = 'none';
+  const s = document.getElementById('successScreen');
+  s.style.display = 'block';
+  setTimeout(() => s.classList.add('show'), 10);
+}
+
+function resetForm() {
+  ratings = {};
+  currentDept = '';
+  currentType = 'care';
+  document.getElementById('commentInput').value = '';
+  document.getElementById('formSection').style.display = 'block';
+  document.getElementById('successScreen').style.display = 'none';
+  document.getElementById('successScreen').classList.remove('show');
+  document.getElementById('submitBtn').disabled = false;
+  selectType('care');
+}
+
+init();
+</script>
+</body>
+</html>
