@@ -1,0 +1,1313 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>វាយតម្លៃសេវាកម្ម - មន្ទីរពេទ្យខេត្តកំពង់ឆ្នាំង</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@300;400;500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=Noto+Sans+Khmer:wght@300;400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+/* ===================================================
+   SHARED / ROOT
+=================================================== */
+:root {
+  --primary: #1a5f8a;
+  --primary-light: #2980b9;
+  --primary-dark: #0d3d5e;
+  --accent: #e8a020;
+  --accent-light: #f5c842;
+  --success: #27ae60;
+  --warning: #f39c12;
+  --danger: #e74c3c;
+  --bg: #f0f6fc;
+  --card: #ffffff;
+  --text: #1a2a3a;
+  --text-muted: #5a7a90;
+  --border: #d0e4f0;
+  --shadow: 0 4px 24px rgba(26,95,138,0.10);
+  --radius: 18px;
+  --sidebar: #0d3d5e;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Kantumruy Pro','Noto Sans Khmer',sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+/* ===================================================
+   PAGE VIEWS
+=================================================== */
+.page { display: none; min-height: 100vh; }
+.page.active { display: block; }
+#adminPage { display: none; min-height: 100vh; }
+#adminPage.active { display: flex; }
+
+/* ===================================================
+   FEEDBACK FORM STYLES
+=================================================== */
+.header {
+  background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 60%, var(--primary-light) 100%);
+  padding: 28px 20px 70px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.header::before {
+  content:''; position:absolute; top:-40px; right:-40px;
+  width:200px; height:200px; border-radius:50%;
+  background:rgba(255,255,255,0.06);
+}
+.header::after {
+  content:''; position:absolute; bottom:-30px; left:-30px;
+  width:150px; height:150px; border-radius:50%;
+  background:rgba(232,160,32,0.15);
+}
+.hospital-logo {
+  width:70px; height:70px; background:white; border-radius:50%;
+  margin:0 auto 14px; display:flex; align-items:center; justify-content:center;
+  font-size:32px; box-shadow:0 4px 20px rgba(0,0,0,0.2); position:relative; z-index:1;
+}
+.header h1 { font-size:1.3rem; font-weight:700; color:white; line-height:1.5; position:relative; z-index:1; }
+.header p  { color:rgba(255,255,255,0.8); font-size:0.85rem; margin-top:6px; position:relative; z-index:1; }
+
+/* Admin link - subtle tap area bottom-right of header */
+.admin-trigger {
+  position:absolute; bottom:10px; right:14px;
+  color:rgba(255,255,255,0.25); font-size:0.7rem;
+  cursor:pointer; z-index:10; user-select:none;
+  padding:6px 10px; border-radius:8px;
+  transition: color 0.2s;
+}
+.admin-trigger:hover { color:rgba(255,255,255,0.6); }
+
+.container { max-width:520px; margin:-45px auto 0; padding:0 16px; position:relative; z-index:10; }
+
+.step-card {
+  background:var(--card); border-radius:var(--radius); padding:28px 24px;
+  box-shadow:var(--shadow); margin-bottom:16px; border:1px solid var(--border);
+  animation:slideUp 0.4s ease both;
+}
+@keyframes slideUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+
+.step-label { display:flex; align-items:center; gap:10px; margin-bottom:16px; }
+.step-num {
+  width:30px; height:30px; background:var(--primary); color:white;
+  border-radius:50%; display:flex; align-items:center; justify-content:center;
+  font-size:0.85rem; font-weight:700; flex-shrink:0;
+}
+.step-title { font-size:1rem; font-weight:600; color:var(--primary-dark); }
+
+.type-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.type-btn {
+  padding:16px 12px; border:2px solid var(--border); border-radius:14px;
+  background:white; cursor:pointer; text-align:center;
+  transition:all 0.2s; font-family:inherit;
+}
+.type-btn:hover { border-color:var(--primary-light); background:#f0f8ff; }
+.type-btn.active {
+  border-color:var(--primary);
+  background:linear-gradient(135deg,#e8f4fd,#dbeef9);
+  box-shadow:0 2px 12px rgba(26,95,138,0.15);
+}
+.type-btn .icon  { font-size:28px; display:block; margin-bottom:6px; }
+.type-btn .label { font-size:0.82rem; font-weight:600; color:var(--primary-dark); line-height:1.4; }
+
+.select-wrap { position:relative; }
+.select-wrap select {
+  width:100%; padding:14px 44px 14px 16px; border:2px solid var(--border);
+  border-radius:12px; font-family:inherit; font-size:0.9rem; color:var(--text);
+  background:white; appearance:none; cursor:pointer; transition:border-color 0.2s; outline:none;
+}
+.select-wrap select:focus { border-color:var(--primary); }
+.select-wrap::after {
+  content:'▾'; position:absolute; right:16px; top:50%;
+  transform:translateY(-50%); color:var(--primary); pointer-events:none; font-size:1rem;
+}
+
+.rating-group {
+  margin-bottom:20px; padding:16px; background:#f8fbff;
+  border-radius:12px; border:1px solid var(--border);
+}
+.rating-group-title {
+  font-size:0.88rem; font-weight:600; color:var(--primary-dark);
+  margin-bottom:12px; display:flex; align-items:center; gap:8px;
+}
+.rating-group-title .icon { font-size:18px; }
+.star-row { display:flex; justify-content:center; gap:8px; }
+.star-btn {
+  background:none; border:none; cursor:pointer; font-size:32px;
+  line-height:1; transition:transform 0.15s; padding:2px; color:#d0d8e0;
+}
+.star-btn:hover { transform:scale(1.2); }
+.star-btn.filled { color:var(--accent); }
+.star-btn.filled:hover { color:var(--accent-light); }
+.rating-label {
+  text-align:center; font-size:0.78rem; color:var(--text-muted);
+  margin-top:6px; min-height:18px; transition:all 0.2s;
+}
+
+.comment-input {
+  width:100%; padding:14px 16px; border:2px solid var(--border);
+  border-radius:12px; font-family:inherit; font-size:0.88rem;
+  resize:vertical; min-height:90px; outline:none; transition:border-color 0.2s; color:var(--text);
+}
+.comment-input:focus { border-color:var(--primary); }
+.comment-input::placeholder { color:#aabcc8; }
+
+.submit-btn {
+  width:100%; padding:17px;
+  background:linear-gradient(135deg,var(--primary),var(--primary-light));
+  color:white; border:none; border-radius:14px;
+  font-family:inherit; font-size:1rem; font-weight:700; cursor:pointer;
+  transition:all 0.2s; box-shadow:0 6px 20px rgba(26,95,138,0.3);
+}
+.submit-btn:hover { transform:translateY(-2px); box-shadow:0 10px 28px rgba(26,95,138,0.4); }
+.submit-btn:disabled { opacity:0.6; cursor:not-allowed; transform:none; box-shadow:none; }
+
+.success-screen { display:none; text-align:center; padding:40px 24px; }
+.success-screen.show { display:block; animation:slideUp 0.5s ease; }
+.success-icon {
+  width:90px; height:90px;
+  background:linear-gradient(135deg,#27ae60,#2ecc71);
+  border-radius:50%; margin:0 auto 20px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:44px; box-shadow:0 8px 24px rgba(39,174,96,0.3);
+}
+.success-screen h2 { font-size:1.4rem; font-weight:700; color:var(--primary-dark); margin-bottom:10px; }
+.success-screen p { color:var(--text-muted); font-size:0.9rem; line-height:1.7; }
+.new-feedback-btn {
+  margin-top:24px; padding:14px 36px; background:var(--primary);
+  color:white; border:none; border-radius:12px;
+  font-family:inherit; font-size:0.9rem; font-weight:600; cursor:pointer; transition:all 0.2s;
+}
+.new-feedback-btn:hover { background:var(--primary-dark); }
+
+.info-bar {
+  background:linear-gradient(135deg,#fff8e8,#fef3cd);
+  border:1px solid #f5c842; border-radius:12px;
+  padding:12px 16px; display:flex; align-items:center; gap:10px;
+  margin-bottom:16px; font-size:0.82rem; color:#7a5a00;
+}
+
+.loading-overlay {
+  display:none; position:fixed; inset:0;
+  background:rgba(0,0,0,0.4); z-index:999;
+  align-items:center; justify-content:center;
+}
+.loading-overlay.show { display:flex; }
+.loading-box { background:white; border-radius:18px; padding:32px 40px; text-align:center; box-shadow:0 20px 60px rgba(0,0,0,0.3); }
+.spinner {
+  width:48px; height:48px; border:4px solid var(--border);
+  border-top-color:var(--primary); border-radius:50%;
+  animation:spin 0.8s linear infinite; margin:0 auto 16px;
+}
+@keyframes spin { to{transform:rotate(360deg)} }
+
+.footer { text-align:center; padding:20px; color:var(--text-muted); font-size:0.78rem; }
+
+/* ===================================================
+   PASSWORD GATE MODAL
+=================================================== */
+.pw-overlay {
+  display:none; position:fixed; inset:0;
+  background:rgba(0,0,0,0.6); z-index:2000;
+  align-items:center; justify-content:center;
+  backdrop-filter:blur(4px);
+}
+.pw-overlay.show { display:flex; }
+.pw-box {
+  background:white; border-radius:22px; padding:36px 32px;
+  max-width:360px; width:90%;
+  box-shadow:0 24px 64px rgba(0,0,0,0.3);
+  text-align:center; animation:slideUp 0.3s ease;
+}
+.pw-icon { font-size:48px; margin-bottom:12px; }
+.pw-box h3 { font-size:1.2rem; font-weight:700; color:var(--primary-dark); margin-bottom:6px; }
+.pw-box p  { font-size:0.82rem; color:var(--text-muted); margin-bottom:20px; }
+.pw-input {
+  width:100%; padding:14px 18px; text-align:center;
+  border:2px solid var(--border); border-radius:12px;
+  font-family:inherit; font-size:1.1rem; letter-spacing:4px;
+  outline:none; transition:border-color 0.2s; margin-bottom:14px;
+}
+.pw-input:focus { border-color:var(--primary); }
+.pw-input.error { border-color:var(--danger); animation:shake 0.3s ease; }
+@keyframes shake {
+  0%,100%{transform:translateX(0)} 25%{transform:translateX(-8px)} 75%{transform:translateX(8px)}
+}
+.pw-error { color:var(--danger); font-size:0.8rem; margin-bottom:12px; min-height:18px; }
+.pw-login-btn {
+  width:100%; padding:14px; background:linear-gradient(135deg,var(--primary),var(--primary-light));
+  color:white; border:none; border-radius:12px;
+  font-family:inherit; font-size:0.95rem; font-weight:700;
+  cursor:pointer; transition:all 0.2s; margin-bottom:10px;
+}
+.pw-login-btn:hover { transform:translateY(-1px); box-shadow:0 6px 18px rgba(26,95,138,0.3); }
+.pw-cancel { font-size:0.8rem; color:var(--text-muted); cursor:pointer; text-decoration:underline; }
+.pw-cancel:hover { color:var(--primary); }
+
+/* ===================================================
+   ADMIN DASHBOARD STYLES
+=================================================== */
+.sidebar {
+  width:240px; background:var(--sidebar); min-height:100vh;
+  position:fixed; left:0; top:0;
+  display:flex; flex-direction:column;
+  z-index:100; box-shadow:4px 0 20px rgba(0,0,0,0.15);
+}
+.sidebar-header { padding:20px 16px; border-bottom:1px solid rgba(255,255,255,0.1); }
+.sidebar-logo { display:flex; align-items:center; gap:10px; margin-bottom:6px; }
+.sidebar-logo .icon {
+  width:40px; height:40px; background:rgba(255,255,255,0.15);
+  border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:20px;
+}
+.sidebar-logo .name { font-family:'Kantumruy Pro',sans-serif; color:white; font-weight:700; font-size:0.85rem; line-height:1.3; }
+.sidebar-sub { color:rgba(255,255,255,0.45); font-size:0.68rem; margin-top:2px; }
+.sidebar-nav { padding:12px 10px; flex:1; overflow-y:auto; }
+.nav-section-title { color:rgba(255,255,255,0.4); font-size:0.65rem; text-transform:uppercase; letter-spacing:1.5px; padding:8px 10px 4px; font-weight:600; }
+.nav-item {
+  display:flex; align-items:center; gap:9px; padding:10px 12px;
+  border-radius:10px; color:rgba(255,255,255,0.72); cursor:pointer;
+  transition:all 0.2s; font-size:0.82rem; margin-bottom:2px;
+}
+.nav-item:hover { background:rgba(255,255,255,0.1); color:white; }
+.nav-item.active { background:var(--primary-light); color:white; box-shadow:0 4px 12px rgba(41,128,185,0.35); }
+.nav-item .nav-icon { font-size:15px; width:18px; text-align:center; }
+.nav-logout {
+  margin:10px; padding:10px 14px; border-radius:10px;
+  background:rgba(231,76,60,0.2); color:#ff8a80;
+  cursor:pointer; font-size:0.82rem; display:flex; align-items:center; gap:8px;
+  transition:all 0.2s; border:none; font-family:inherit; width:calc(100% - 20px);
+}
+.nav-logout:hover { background:rgba(231,76,60,0.35); color:white; }
+
+.admin-main { margin-left:240px; flex:1; min-height:100vh; display:flex; flex-direction:column; font-family:'IBM Plex Sans','Kantumruy Pro',sans-serif; }
+
+.topbar {
+  background:white; padding:14px 24px;
+  display:flex; align-items:center; justify-content:space-between;
+  border-bottom:1px solid var(--border);
+  box-shadow:0 2px 8px rgba(0,0,0,0.05);
+  position:sticky; top:0; z-index:50;
+}
+.topbar-title { font-family:'Kantumruy Pro',sans-serif; font-size:1rem; font-weight:700; color:var(--primary-dark); }
+.topbar-controls { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+.filter-select {
+  padding:7px 12px; border:1.5px solid var(--border); border-radius:8px;
+  font-family:inherit; font-size:0.78rem; outline:none; cursor:pointer; background:white;
+}
+.filter-select:focus { border-color:var(--primary); }
+.export-btn {
+  padding:8px 14px; background:var(--primary); color:white; border:none;
+  border-radius:8px; font-family:inherit; font-size:0.78rem; font-weight:600;
+  cursor:pointer; display:flex; align-items:center; gap:5px; transition:all 0.2s; white-space:nowrap;
+}
+.export-btn:hover { background:var(--primary-dark); }
+.export-btn.csv { background:var(--success); }
+.export-btn.csv:hover { background:#219150; }
+
+.admin-content { padding:20px 24px; flex:1; }
+
+.date-range-bar {
+  background:white; border:1px solid var(--border); border-radius:12px;
+  padding:12px 18px; display:flex; align-items:center; gap:12px;
+  margin-bottom:20px; flex-wrap:wrap;
+}
+.date-range-bar label { font-size:0.78rem; color:var(--text-muted); font-weight:600; }
+.date-range-bar input[type=date] {
+  padding:6px 10px; border:1.5px solid var(--border); border-radius:8px;
+  font-family:inherit; font-size:0.78rem; outline:none;
+}
+.date-range-bar input[type=date]:focus { border-color:var(--primary); }
+
+.kpi-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:20px; }
+.kpi-card {
+  background:var(--card); border-radius:14px; padding:18px;
+  border:1px solid var(--border); box-shadow:0 2px 12px rgba(0,0,0,0.04);
+  display:flex; align-items:center; gap:14px;
+}
+.kpi-icon { width:48px; height:48px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:22px; flex-shrink:0; }
+.kpi-icon.blue{background:#e8f4fd} .kpi-icon.green{background:#e8f9f0}
+.kpi-icon.orange{background:#fff3e0} .kpi-icon.red{background:#fdecea}
+.kpi-data .value { font-size:1.7rem; font-weight:700; color:var(--primary-dark); line-height:1; }
+.kpi-data .label { font-size:0.73rem; color:var(--text-muted); margin-top:4px; font-family:'Kantumruy Pro',sans-serif; }
+
+.chart-grid { display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-bottom:20px; }
+.chart-full { grid-column:1/-1; }
+.chart-card {
+  background:var(--card); border-radius:14px; padding:20px;
+  border:1px solid var(--border); box-shadow:0 2px 12px rgba(0,0,0,0.04);
+}
+.chart-title { font-family:'Kantumruy Pro',sans-serif; font-size:0.9rem; font-weight:700; color:var(--primary-dark); margin-bottom:3px; }
+.chart-subtitle { font-size:0.72rem; color:var(--text-muted); margin-bottom:14px; }
+.chart-wrap { position:relative; height:240px; }
+.chart-wrap.tall { height:300px; }
+
+.table-card {
+  background:var(--card); border-radius:14px; padding:20px;
+  border:1px solid var(--border); box-shadow:0 2px 12px rgba(0,0,0,0.04);
+  margin-bottom:20px; overflow-x:auto;
+}
+table { width:100%; border-collapse:collapse; }
+th {
+  background:var(--bg); padding:9px 12px; text-align:left;
+  font-size:0.72rem; font-weight:700; color:var(--text-muted);
+  text-transform:uppercase; letter-spacing:0.5px; border-bottom:2px solid var(--border);
+}
+td { padding:11px 12px; font-size:0.82rem; border-bottom:1px solid var(--border); vertical-align:middle; }
+tr:last-child td { border-bottom:none; }
+tr:hover td { background:#f7fbff; }
+
+.score-badge { display:inline-flex; align-items:center; gap:3px; padding:3px 9px; border-radius:20px; font-weight:700; font-size:0.78rem; }
+.score-5{background:#e8f9f0;color:#1a8c4e} .score-4{background:#e8f4fd;color:#1a5f8a}
+.score-3{background:#fff3e0;color:#b36a00} .score-2{background:#fdecea;color:#b02020}
+.mini-stars { color:var(--accent); font-size:0.82rem; letter-spacing:1px; }
+.progress-bar { height:8px; background:var(--bg); border-radius:4px; overflow:hidden; min-width:80px; }
+.progress-fill { height:100%; border-radius:4px; background:linear-gradient(90deg,var(--primary),var(--primary-light)); }
+
+.dept-badge { font-size:0.72rem; background:#e8f4fd; color:#1a5f8a; padding:2px 8px; border-radius:20px; }
+
+.config-panel { background:var(--card); border-radius:14px; padding:20px; border:1px solid var(--border); margin-bottom:20px; }
+.config-panel h3 { font-family:'Kantumruy Pro',sans-serif; font-size:0.9rem; font-weight:700; color:var(--primary-dark); margin-bottom:14px; }
+.config-row { display:grid; grid-template-columns:140px 1fr; gap:10px; align-items:center; margin-bottom:10px; }
+.config-label { font-size:0.78rem; font-weight:600; color:var(--text-muted); }
+.config-input { padding:8px 12px; border:1.5px solid var(--border); border-radius:8px; font-family:inherit; font-size:0.8rem; outline:none; width:100%; }
+.config-input:focus { border-color:var(--primary); }
+.save-config-btn { padding:9px 20px; background:var(--primary); color:white; border:none; border-radius:8px; font-family:inherit; font-size:0.8rem; font-weight:600; cursor:pointer; }
+
+.setup-code {
+  display:block; background:#f4f8fc; border:1px solid var(--border);
+  border-radius:10px; padding:14px 16px; font-size:0.73rem;
+  color:var(--primary-dark); white-space:pre-wrap; word-break:break-all;
+  margin-bottom:14px; max-height:320px; overflow-y:auto; font-family:monospace;
+}
+
+.modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:500; align-items:center; justify-content:center; }
+.modal-overlay.show { display:flex; }
+.modal { background:white; border-radius:16px; padding:26px; max-width:420px; width:90%; box-shadow:0 20px 60px rgba(0,0,0,0.2); }
+.modal h3 { font-size:1rem; font-weight:700; margin-bottom:12px; color:var(--primary-dark); }
+.modal p { font-size:0.82rem; color:var(--text-muted); margin-bottom:10px; line-height:1.6; }
+.modal-close { padding:9px 20px; background:var(--primary); color:white; border:none; border-radius:8px; font-family:inherit; font-size:0.82rem; font-weight:600; cursor:pointer; margin-right:8px; }
+
+/* Responsive */
+@media(max-width:1100px){ .kpi-grid{grid-template-columns:repeat(2,1fr)} .chart-grid{grid-template-columns:1fr} .chart-full{grid-column:1} }
+@media(max-width:768px){ .sidebar{display:none} .admin-main{margin-left:0} .admin-content{padding:14px} }
+@media(max-width:380px){ .star-btn{font-size:28px} .step-card{padding:20px 16px} }
+
+@media print {
+  .sidebar, .topbar, .date-range-bar, .topbar-controls { display:none !important; }
+  .admin-main { margin-left:0 !important; }
+}
+</style>
+</head>
+<body>
+
+<!-- =====================================================
+     FEEDBACK PAGE
+===================================================== -->
+<div id="feedbackPage" class="page active">
+  <div class="header">
+    <div class="hospital-logo">🏥</div>
+    <h1>មន្ទីរពេទ្យខេត្តកំពង់ឆ្នាំង<br>Kampong Chhnang Provincial Hospital</h1>
+    <p>📋 សូមផ្តល់មតិយោបល់ដើម្បីលើកកម្ពស់គុណភាពសេវាកម្ម</p>
+    <span class="admin-trigger" onclick="showPwGate()" title="Admin">⚙</span>
+  </div>
+
+  <div class="container">
+    <div class="info-bar">
+      🔒 ព័ត៌មានរបស់អ្នករក្សាជាការសម្ងាត់ · ប្រើពេលតិចជាង ៣ នាទី
+    </div>
+
+    <div id="formSection">
+      <!-- STEP 1 -->
+      <div class="step-card" style="animation-delay:0.05s">
+        <div class="step-label">
+          <div class="step-num">១</div>
+          <div class="step-title">ជ្រើសរើសប្រភេទសេវាកម្ម</div>
+        </div>
+        <div class="type-grid">
+          <button class="type-btn active" onclick="selectType('care')" id="btn-care">
+            <span class="icon">🩺</span>
+            <span class="label">ការថែទាំព្យាបាល<br><small style="font-weight:400;color:#888">Care Delivery</small></span>
+          </button>
+          <button class="type-btn" onclick="selectType('support')" id="btn-support">
+            <span class="icon">🔬</span>
+            <span class="label">សេវាជំនួយ<br><small style="font-weight:400;color:#888">Support Service</small></span>
+          </button>
+        </div>
+      </div>
+
+      <!-- STEP 2 -->
+      <div class="step-card" style="animation-delay:0.1s">
+        <div class="step-label">
+          <div class="step-num">២</div>
+          <div class="step-title">ជ្រើសរើសផ្នែក / Department</div>
+        </div>
+        <div class="select-wrap">
+          <select id="departmentSelect" onchange="onDeptChange()">
+            <option value="">-- សូមជ្រើសរើសផ្នែក --</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- STEP 3 -->
+      <div class="step-card" id="ratingsCard" style="animation-delay:0.15s">
+        <div class="step-label">
+          <div class="step-num">៣</div>
+          <div class="step-title">វាយតម្លៃសេវាកម្ម (ចុចផ្កាយ ១–៥)</div>
+        </div>
+        <div id="ratingsContainer"></div>
+      </div>
+
+      <!-- STEP 4 -->
+      <div class="step-card" style="animation-delay:0.2s">
+        <div class="step-label">
+          <div class="step-num">៤</div>
+          <div class="step-title">យោបល់បន្ថែម (ស្រេចចិត្ត)</div>
+        </div>
+        <textarea class="comment-input" id="commentInput"
+          placeholder="សូមចែករំលែកបទពិសោធន៍របស់អ្នក..."></textarea>
+      </div>
+
+      <button class="submit-btn" id="submitBtn" onclick="submitFeedback()">
+        ✅ &nbsp;ផ្ញើមតិយោបល់
+      </button>
+    </div>
+
+    <!-- SUCCESS -->
+    <div class="step-card success-screen" id="successScreen">
+      <div class="success-icon">✓</div>
+      <h2>អរគុណសម្រាប់មតិយោបល់!</h2>
+      <p>យើងបានទទួលមតិយោបល់របស់អ្នករួចហើយ។<br>
+      អ្នកបានជួយយើងក្នុងការលើកកម្ពស់<br>គុណភាពសេវាកម្មមន្ទីរពេទ្យ។</p>
+      <p style="margin-top:12px;font-size:0.82rem;color:#27ae60;font-weight:600">
+        ✨ មតិរបស់អ្នកមានតម្លៃមិនអាចប្រៀបបាន
+      </p>
+      <button class="new-feedback-btn" onclick="resetForm()">🔄 ផ្តល់មតិថ្មីទៀត</button>
+    </div>
+
+    <div class="footer">© ២០២៦ · មន្ទីរពេទ្យខេត្តកំពង់ឆ្នាំង · KCPH Quality Improvement</div>
+  </div>
+</div>
+
+<!-- =====================================================
+     PASSWORD GATE
+===================================================== -->
+<div class="pw-overlay" id="pwOverlay">
+  <div class="pw-box">
+    <div class="pw-icon">🔐</div>
+    <h3>Admin Access</h3>
+    <p>សូមបញ្ចូលលេខសម្ងាត់<br>Enter admin password to continue</p>
+    <input class="pw-input" type="password" id="pwInput"
+      placeholder="••••••" maxlength="20"
+      onkeydown="if(event.key==='Enter')checkPassword()">
+    <div class="pw-error" id="pwError"></div>
+    <button class="pw-login-btn" onclick="checkPassword()">🔓 Login</button>
+    <div class="pw-cancel" onclick="hidePwGate()">ត្រលប់ / Cancel</div>
+  </div>
+</div>
+
+<!-- =====================================================
+     ADMIN DASHBOARD PAGE
+===================================================== -->
+<div id="adminPage">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">
+        <div class="icon">🏥</div>
+        <div>
+          <div class="name">KCPH Admin</div>
+          <div class="name" style="font-size:0.72rem;font-weight:400;opacity:0.7">Report Dashboard</div>
+        </div>
+      </div>
+      <div class="sidebar-sub">Patient Satisfaction System</div>
+    </div>
+    <div class="sidebar-nav">
+      <div class="nav-section-title">Dashboard</div>
+      <div class="nav-item active" onclick="showAdminSection('overview')">
+        <span class="nav-icon">📊</span> Overview
+      </div>
+      <div class="nav-item" onclick="showAdminSection('charts')">
+        <span class="nav-icon">📈</span> Charts & Trends
+      </div>
+      <div class="nav-item" onclick="showAdminSection('departments')">
+        <span class="nav-icon">🏢</span> By Department
+      </div>
+      <div class="nav-section-title" style="margin-top:10px">Export Reports</div>
+      <div class="nav-item" onclick="exportReport('weekly')">
+        <span class="nav-icon">📅</span> Weekly Report
+      </div>
+      <div class="nav-item" onclick="exportReport('monthly')">
+        <span class="nav-icon">📆</span> Monthly Report
+      </div>
+      <div class="nav-item" onclick="exportReport('quarterly')">
+        <span class="nav-icon">🗓️</span> Quarterly Report
+      </div>
+      <div class="nav-item" onclick="exportReport('annual')">
+        <span class="nav-icon">📋</span> Annual Report
+      </div>
+      <div class="nav-section-title" style="margin-top:10px">Settings</div>
+      <div class="nav-item" onclick="showAdminSection('config')">
+        <span class="nav-icon">⚙️</span> Configuration
+      </div>
+      <div class="nav-item" onclick="showAdminSection('setup')">
+        <span class="nav-icon">🔗</span> Apps Script Setup
+      </div>
+    </div>
+    <button class="nav-logout" onclick="adminLogout()">🚪 Logout</button>
+  </div>
+
+  <!-- MAIN -->
+  <div class="admin-main">
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <div class="topbar-title" id="adminPageTitle">Overview Dashboard</div>
+      <div class="topbar-controls">
+        <select class="filter-select" id="periodFilter" onchange="refreshData()">
+          <option value="7">7 Days</option>
+          <option value="30" selected>30 Days</option>
+          <option value="90">90 Days</option>
+          <option value="365">1 Year</option>
+        </select>
+        <select class="filter-select" id="deptFilter" onchange="refreshData()">
+          <option value="all">All Departments</option>
+          <optgroup label="Care Delivery">
+            <option>OPD</option><option>Emergency</option><option>ICU</option>
+            <option>General Medicine</option><option>Trauma-Surgery A</option>
+            <option>Trauma-Surgery B</option><option>Gynecology</option>
+            <option>Maternity</option><option>Pediatry</option>
+            <option>NCU</option><option>Eye Unit</option><option>Dialysis</option>
+          </optgroup>
+          <optgroup label="Support Service">
+            <option>Laboratory</option><option>Blood Bank</option>
+            <option>Radiology</option><option>Ultrasound</option>
+            <option>PMRS</option><option>Cashier</option><option>Pharmacy</option>
+          </optgroup>
+        </select>
+        <button class="export-btn csv" onclick="exportCSV()">📥 CSV</button>
+        <button class="export-btn" onclick="window.print()">🖨️ Print</button>
+      </div>
+    </div>
+
+    <div class="admin-content">
+
+      <!-- OVERVIEW SECTION -->
+      <div id="asec-overview">
+        <div class="date-range-bar">
+          <label>📅 ពី:</label>
+          <input type="date" id="dateFrom">
+          <label>ដល់:</label>
+          <input type="date" id="dateTo">
+          <button class="export-btn" style="padding:7px 14px" onclick="refreshData()">🔍 Filter</button>
+        </div>
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-icon blue">📝</div>
+            <div class="kpi-data">
+              <div class="value" id="kpi-total">0</div>
+              <div class="label">ចំនួនមតិសរុប</div>
+            </div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon green">⭐</div>
+            <div class="kpi-data">
+              <div class="value" id="kpi-avg">0.0</div>
+              <div class="label">ពិន្ទុ​មធ្យម (/ 5)</div>
+            </div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon orange">😄</div>
+            <div class="kpi-data">
+              <div class="value" id="kpi-satisfied">0%</div>
+              <div class="label">ពេញចិត្ត (≥4★)</div>
+            </div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon red">😞</div>
+            <div class="kpi-data">
+              <div class="value" id="kpi-poor">0%</div>
+              <div class="label">មិនពេញចិត្ត (≤2★)</div>
+            </div>
+          </div>
+        </div>
+        <div class="chart-grid">
+          <div class="chart-card chart-full">
+            <div class="chart-title">📈 Run Chart — ពិន្ទុ​មធ្យមប្រចាំថ្ងៃ</div>
+            <div class="chart-subtitle">Daily Average Satisfaction Score with 7-Day Moving Average</div>
+            <div class="chart-wrap tall"><canvas id="runChart"></canvas></div>
+          </div>
+        </div>
+        <div class="chart-grid">
+          <div class="chart-card">
+            <div class="chart-title">📊 ពិន្ទុ​ក្នុងប្រភេទ</div>
+            <div class="chart-subtitle">Average Score by Question Category</div>
+            <div class="chart-wrap"><canvas id="categoryBar"></canvas></div>
+          </div>
+          <div class="chart-card">
+            <div class="chart-title">🏢 ពិន្ទុ​ក្នុងផ្នែក</div>
+            <div class="chart-subtitle">Average Score by Department (Top 10)</div>
+            <div class="chart-wrap"><canvas id="deptBar"></canvas></div>
+          </div>
+        </div>
+        <div class="chart-grid">
+          <div class="chart-card">
+            <div class="chart-title">🔄 ចំណែកកម្រិតពេញចិត្ត</div>
+            <div class="chart-subtitle">Distribution of Satisfaction Ratings</div>
+            <div class="chart-wrap"><canvas id="distDoughnut"></canvas></div>
+          </div>
+          <div class="chart-card">
+            <div class="chart-title">📅 Trend ប្រចាំខែ</div>
+            <div class="chart-subtitle">Monthly Feedback Volume & Average Score</div>
+            <div class="chart-wrap"><canvas id="monthlyTrend"></canvas></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CHARTS SECTION -->
+      <div id="asec-charts" style="display:none">
+        <div class="chart-grid">
+          <div class="chart-card chart-full">
+            <div class="chart-title">📈 Run Chart — ពិន្ទុ​ប្រចាំសប្តាហ៍</div>
+            <div class="chart-subtitle">Weekly Average Score Trend with Response Volume</div>
+            <div class="chart-wrap tall"><canvas id="weeklyRunChart"></canvas></div>
+          </div>
+        </div>
+        <div class="chart-grid">
+          <div class="chart-card">
+            <div class="chart-title">📊 Care vs Support Comparison</div>
+            <div class="chart-subtitle">Average score by service type</div>
+            <div class="chart-wrap"><canvas id="compareBar"></canvas></div>
+          </div>
+          <div class="chart-card">
+            <div class="chart-title">📈 ចំនួន Feedback ប្រចាំខែ</div>
+            <div class="chart-subtitle">Monthly feedback volume trend</div>
+            <div class="chart-wrap"><canvas id="volumeBar"></canvas></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DEPARTMENTS SECTION -->
+      <div id="asec-departments" style="display:none">
+        <div class="table-card">
+          <div class="chart-title" style="margin-bottom:4px">🏢 Department Summary</div>
+          <div class="chart-subtitle" style="margin-bottom:14px">Ranked by average satisfaction score</div>
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>ផ្នែក / Department</th>
+                <th>ប្រភេទ</th>
+                <th>ចំនួនមតិ</th>
+                <th>ពិន្ទុ​មធ្យម</th>
+                <th>ចំណាត់</th>
+                <th>Progress</th>
+              </tr>
+            </thead>
+            <tbody id="deptTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- CONFIG SECTION -->
+      <div id="asec-config" style="display:none">
+        <div class="config-panel">
+          <h3>⚙️ System Configuration</h3>
+          <div class="config-row">
+            <div class="config-label">Apps Script URL:</div>
+            <input class="config-input" type="text" id="configScriptUrl" placeholder="https://script.google.com/macros/s/YOUR_ID/exec">
+          </div>
+          <div class="config-row">
+            <div class="config-label">Google Sheet ID:</div>
+            <input class="config-input" type="text" id="configSheetId" placeholder="Your Google Sheet ID">
+          </div>
+          <div class="config-row">
+            <div class="config-label">Admin Password:</div>
+            <input class="config-input" type="password" id="configPassword" placeholder="Change admin password">
+          </div>
+          <div class="config-row">
+            <div class="config-label">Hospital Name:</div>
+            <input class="config-input" type="text" id="configHospital" value="Kampong Chhnang Provincial Hospital">
+          </div>
+          <button class="save-config-btn" onclick="saveConfig()">💾 Save Configuration</button>
+        </div>
+      </div>
+
+      <!-- SETUP SECTION -->
+      <div id="asec-setup" style="display:none">
+        <div class="config-panel">
+          <h3>🔗 Google Apps Script Setup Guide</h3>
+          <p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:12px;line-height:1.7">
+            <strong>Step 1:</strong> Create a new Google Sheet named "KCPH_Feedback"<br>
+            <strong>Step 2:</strong> Extensions → Apps Script → paste code below<br>
+            <strong>Step 3:</strong> Deploy → New deployment → Web App → Execute as "Me" → Anyone<br>
+            <strong>Step 4:</strong> Copy deployment URL → paste in Configuration above
+          </p>
+          <code class="setup-code" id="appsScriptCode">const SHEET_NAME = 'Feedback';
+
+function doPost(e) {
+  try {
+    const data = JSON.parse(e.postData.contents);
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    let sheet = ss.getSheetByName(SHEET_NAME);
+    if (!sheet) sheet = ss.insertSheet(SHEET_NAME);
+
+    if (sheet.getLastRow() === 0) {
+      sheet.appendRow(['Timestamp','Type','Department',
+        'Q1','Q2','Q3','Q4','Q5','Q6',
+        'Avg Score','Comment']);
+    }
+
+    const r = data.ratings;
+    const keys = Object.keys(r);
+    sheet.appendRow([
+      new Date(data.timestamp), data.type, data.department,
+      r[keys[0]]||'', r[keys[1]]||'', r[keys[2]]||'',
+      r[keys[3]]||'', r[keys[4]]||'', r[keys[5]]||'',
+      data.avgScore, data.comment
+    ]);
+
+    return ContentService
+      .createTextOutput(JSON.stringify({success:true}))
+      .setMimeType(ContentService.MimeType.JSON);
+  } catch(err) {
+    return ContentService
+      .createTextOutput(JSON.stringify({error:err.message}))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+function doGet(e) {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet()
+    .getSheetByName(SHEET_NAME);
+  if (!sheet) return ContentService
+    .createTextOutput(JSON.stringify([]))
+    .setMimeType(ContentService.MimeType.JSON);
+  const rows = sheet.getDataRange().getValues();
+  const headers = rows[0];
+  const data = rows.slice(1).map(r => {
+    const obj = {};
+    headers.forEach((h,i) => obj[h] = r[i]);
+    return obj;
+  });
+  return ContentService
+    .createTextOutput(JSON.stringify(data))
+    .setMimeType(ContentService.MimeType.JSON);
+}</code>
+          <button class="save-config-btn" onclick="copySetupCode()">📋 Copy Code</button>
+        </div>
+      </div>
+
+    </div><!-- end admin-content -->
+  </div><!-- end admin-main -->
+</div><!-- end adminPage -->
+
+<!-- LOADING -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-box">
+    <div class="spinner"></div>
+    <p style="color:#1a5f8a;font-weight:600">កំពុងផ្ញើ...</p>
+  </div>
+</div>
+
+<!-- EXPORT MODAL -->
+<div class="modal-overlay" id="exportModal">
+  <div class="modal">
+    <h3>📤 Export Report</h3>
+    <p id="exportModalText"></p>
+    <p>Use your browser's print dialog and select "Save as PDF" to generate the report file.</p>
+    <button class="modal-close" onclick="document.getElementById('exportModal').classList.remove('show');window.print()">🖨️ Print / Save PDF</button>
+    <button class="modal-close" style="background:#888" onclick="document.getElementById('exportModal').classList.remove('show')">Close</button>
+  </div>
+</div>
+
+<script>
+// =====================================================
+//  CONFIG
+// =====================================================
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec';
+const DEFAULT_PASSWORD = 'KCPH2026';  // ← Change this password
+
+// =====================================================
+//  FEEDBACK DATA
+// =====================================================
+const DEPARTMENTS = {
+  care: [
+    { value: 'OPD',            label: 'OPD / ពិគ្រោះជំងឺក្រៅ' },
+    { value: 'Emergency',      label: 'Emergency / សង្គ្រោះបន្ទាន់' },
+    { value: 'ICU',            label: 'ICU / សង្គ្រោះបន្ទាន់កម្រិតធ្ងន់' },
+    { value: 'General Medicine', label: 'General Medicine / ជំងឺទូទៅ' },
+    { value: 'Trauma-Surgery A', label: 'Trauma-Surgery A / របួសសល្យសាស្ត្រ ក' },
+    { value: 'Trauma-Surgery B', label: 'Trauma-Surgery B / របួសសល្យសាស្ត្រ ខ' },
+    { value: 'Operation Theater', label: 'Operation Theater / សល្យាគារ' },
+    { value: 'Gynecology',     label: 'Gynecology / រោគស្ត្រី' },
+    { value: 'Maternity',      label: 'Maternity / សម្ភព' },
+    { value: 'Pediatry',       label: 'Pediatry / ជំងឺកុមារ' },
+    { value: 'NCU',            label: 'NCU / ថែទាំទារក' },
+    { value: 'Eye Unit',       label: 'Eye Unit / ចក្ខុរោគ' },
+    { value: 'Dialysis',       label: 'Dialysis / លាងឈាម' },
+  ],
+  support: [
+    { value: 'Laboratory',  label: 'Laboratory / មន្ទីរពិសោធន៍' },
+    { value: 'Blood Bank',  label: 'Blood Bank / ផ្តល់ឈាម' },
+    { value: 'Radiology',   label: 'Radiology / វិទ្យុសាស្ត្រ' },
+    { value: 'Ultrasound',  label: 'Ultrasound / អេកូសាស្ត្រ' },
+    { value: 'PMRS',        label: 'PMRS / កន្លែងចុះឈ្មោះនិងធ្វើឯកសារ' },
+    { value: 'Cashier',     label: 'Cashier / បញ្ជរបង់លុយ' },
+    { value: 'Pharmacy',    label: 'Pharmacy / ឱសថស្ថាន' },
+  ]
+};
+
+const CARE_QUESTIONS = [
+  { key: 'care_delivery',  icon: '🩺', label: 'ការផ្តល់សេវាព្យាបាល\nCare Delivery' },
+  { key: 'waiting_time',   icon: '⏱️', label: 'ពេលវេលារង់ចាំ\nWaiting Time' },
+  { key: 'counseling',     icon: '💬', label: 'ការពន្យល់និងការណែនាំ\nExplaining & Counseling' },
+  { key: 'env_sanitation', icon: '🏥', label: 'អនាម័យបរិស្ថាន\nEnvironmental Sanitation' },
+  { key: 'hospitality',    icon: '🤝', label: 'ភាពរួសរាយរាក់ទាក់\nHospitality' },
+  { key: 'wc_sanitation',  icon: '🚻', label: 'អនាម័យបន្ទប់ទឹក\nW.C Sanitation' },
+];
+
+const SUPPORT_QUESTIONS = {
+  'Laboratory': [
+    { key: 'waiting_time',       icon: '⏱️', label: 'ពេលវេលារង់ចាំ\nWaiting Time' },
+    { key: 'staff_manner',       icon: '😊', label: 'ភាពរួសរាយរាក់ទាក់បុគ្គលិក\nStaff Manner' },
+    { key: 'sample_technique',   icon: '💉', label: 'បច្ចេកទេសស្រង់វត្ថុវិភាគ\nSample Collection Technique' },
+    { key: 'result_explanation', icon: '📋', label: 'ការពន្យល់លទ្ធផល\nResult Explanation' },
+    { key: 'env_sanitation',     icon: '✨', label: 'អនាម័យបរិស្ថាន\nEnvironmental Sanitation' },
+  ],
+  'Blood Bank': [
+    { key: 'waiting_time',       icon: '⏱️', label: 'ពេលវេលារង់ចាំ\nWaiting Time' },
+    { key: 'staff_manner',       icon: '😊', label: 'ភាពរួសរាយរាក់ទាក់បុគ្គលិក\nStaff Manner' },
+    { key: 'sample_technique',   icon: '💉', label: 'ការបូមឈាម\nBlood Collection Technique' },
+    { key: 'result_explanation', icon: '📋', label: 'ការពន្យល់ និងការណែនាំ\nExplanation & Guidance' },
+    { key: 'env_sanitation',     icon: '✨', label: 'អនាម័យបរិស្ថាន\nEnvironmental Sanitation' },
+  ],
+  'Radiology': [
+    { key: 'waiting_time',          icon: '⏱️', label: 'ពេលវេលារង់ចាំ\nWaiting Time' },
+    { key: 'staff_manner',          icon: '😊', label: 'ភាពរួសរាយរាក់ទាក់បុគ្គលិក\nStaff Manner' },
+    { key: 'procedure_explanation', icon: '🩻', label: 'ការពន្យល់នីតិវិធីថតរូប\nProcedure Explanation' },
+    { key: 'service_quality',       icon: '⭐', label: 'គុណភាពនៃសេវាកម្ម\nService Quality' },
+    { key: 'env_sanitation',        icon: '✨', label: 'អនាម័យបរិស្ថាន\nEnvironmental Sanitation' },
+  ],
+  'Ultrasound': [
+    { key: 'waiting_time',          icon: '⏱️', label: 'ពេលវេលារង់ចាំ\nWaiting Time' },
+    { key: 'staff_manner',          icon: '😊', label: 'ភាពរួសរាយរាក់ទាក់បុគ្គលិក\nStaff Manner' },
+    { key: 'procedure_explanation', icon: '🔊', label: 'ការពន្យល់នីតិវិធីអេកូ\nUltrasound Procedure Explanation' },
+    { key: 'env_sanitation',        icon: '✨', label: 'អនាម័យបរិស្ថាន\nEnvironmental Sanitation' },
+    { key: 'overall_service',       icon: '🌟', label: 'ការវាយតម្លៃទូទៅ\nOverall Service' },
+  ],
+  'PMRS': [
+    { key: 'waiting_time',   icon: '⏱️', label: 'ពេលវេលារង់ចាំចុះឈ្មោះ\nRegistration Waiting Time' },
+    { key: 'staff_manner',   icon: '😊', label: 'ភាពរួសរាយរាក់ទាក់បុគ្គលិក\nStaff Manner' },
+    { key: 'doc_accuracy',   icon: '📄', label: 'ភាពត្រឹមត្រូវនៃឯកសារ\nDocument Accuracy' },
+    { key: 'reg_process',    icon: '🗂️', label: 'ភាពងាយស្រួលក្នុងការចុះឈ្មោះ\nRegistration Process' },
+    { key: 'env_sanitation', icon: '✨', label: 'អនាម័យបរិស្ថាន\nEnvironmental Sanitation' },
+  ],
+  'Cashier': [
+    { key: 'waiting_time',     icon: '⏱️', label: 'ពេលវេលារង់ចាំបង់លុយ\nPayment Waiting Time' },
+    { key: 'staff_manner',     icon: '😊', label: 'ភាពរួសរាយរាក់ទាក់បុគ្គលិក\nStaff Manner' },
+    { key: 'billing_accuracy', icon: '🧾', label: 'ភាពត្រឹមត្រូវនៃការចេញវិក្កយបត្រ\nBilling Accuracy' },
+    { key: 'payment_process',  icon: '💳', label: 'ភាពងាយស្រួលក្នុងការបង់លុយ\nPayment Process' },
+    { key: 'env_sanitation',   icon: '✨', label: 'អនាម័យបរិស្ថាន\nEnvironmental Sanitation' },
+  ],
+  'Pharmacy': [
+    { key: 'waiting_time',      icon: '⏱️', label: 'ពេលវេលារង់ចាំទទួលថ្នាំ\nMedication Waiting Time' },
+    { key: 'staff_manner',      icon: '😊', label: 'ភាពរួសរាយរាក់ទាក់បុគ្គលិក\nStaff Manner' },
+    { key: 'med_explanation',   icon: '💊', label: 'ការពន្យល់ការប្រើប្រាស់ថ្នាំ\nMedication Usage Explanation' },
+    { key: 'drug_availability', icon: '🏪', label: 'ភាពគ្រប់គ្រាន់នៃថ្នាំ\nDrug Availability' },
+    { key: 'env_sanitation',    icon: '✨', label: 'អនាម័យបរិស្ថាន\nEnvironmental Sanitation' },
+  ],
+};
+
+const STAR_LABELS = ['','😞 ខ្សោយ','😐 ចាំបាច់កែ','🙂 ល្អ','😊 ល្អណាស់','😄 ល្អឥតខ្ចោះ'];
+
+// =====================================================
+//  FEEDBACK STATE
+// =====================================================
+let currentType = 'care';
+let currentDept = '';
+let ratings = {};
+
+function init() {
+  populateDepts('care');
+  renderRatings('care');
+  // set default dates
+  const now = new Date();
+  const from = new Date(); from.setDate(from.getDate() - 30);
+  const fmt = d => d.toISOString().slice(0,10);
+  const df = document.getElementById('dateFrom');
+  const dt = document.getElementById('dateTo');
+  if (df) df.value = fmt(from);
+  if (dt) dt.value = fmt(now);
+}
+
+function selectType(type) {
+  currentType = type;
+  ratings = {};
+  document.getElementById('btn-care').classList.toggle('active', type==='care');
+  document.getElementById('btn-support').classList.toggle('active', type==='support');
+  populateDepts(type);
+  renderRatings(type);
+  document.getElementById('departmentSelect').value = '';
+  currentDept = '';
+}
+
+function populateDepts(type) {
+  const sel = document.getElementById('departmentSelect');
+  sel.innerHTML = '<option value="">-- សូមជ្រើសរើសផ្នែក --</option>';
+  DEPARTMENTS[type].forEach(d => {
+    const opt = document.createElement('option');
+    opt.value = d.value; opt.textContent = d.label;
+    sel.appendChild(opt);
+  });
+}
+
+function onDeptChange() {
+  currentDept = document.getElementById('departmentSelect').value;
+  if (currentType === 'support' && currentDept) { ratings = {}; renderRatings('support'); }
+}
+
+function getQuestions() {
+  if (currentType === 'care') return CARE_QUESTIONS;
+  return SUPPORT_QUESTIONS[currentDept] || SUPPORT_QUESTIONS['Laboratory'];
+}
+
+function renderRatings(type) {
+  const questions = type === 'care' ? CARE_QUESTIONS : (SUPPORT_QUESTIONS[currentDept] || SUPPORT_QUESTIONS['Laboratory']);
+  const container = document.getElementById('ratingsContainer');
+  container.innerHTML = '';
+  questions.forEach(q => {
+    ratings[q.key] = 0;
+    const lines = q.label.split('\n');
+    container.innerHTML += `
+      <div class="rating-group" id="group-${q.key}">
+        <div class="rating-group-title">
+          <span class="icon">${q.icon}</span>
+          <span>${lines[0]}<br><small style="font-weight:400;color:#7a9ab0">${lines[1]||''}</small></span>
+        </div>
+        <div class="star-row" id="stars-${q.key}">
+          ${[1,2,3,4,5].map(i=>`<button class="star-btn" onclick="setRating('${q.key}',${i})">★</button>`).join('')}
+        </div>
+        <div class="rating-label" id="label-${q.key}">សូមជ្រើសរើសការវាយតម្លៃ</div>
+      </div>`;
+  });
+}
+
+function setRating(key, val) {
+  ratings[key] = val;
+  document.querySelectorAll(`#stars-${key} .star-btn`).forEach((s,i) => s.classList.toggle('filled', i < val));
+  document.getElementById(`label-${key}`).textContent = STAR_LABELS[val];
+  document.getElementById(`group-${key}`).style.background = '#f0faf4';
+  document.getElementById(`group-${key}`).style.borderColor = '#27ae60';
+}
+
+async function submitFeedback() {
+  if (!currentDept) { alert('សូមជ្រើសរើសផ្នែក!'); return; }
+  const unanswered = getQuestions().filter(q => !ratings[q.key]);
+  if (unanswered.length > 0) { alert('សូមវាយតម្លៃប្រធានបទទាំងអស់!'); return; }
+
+  document.getElementById('submitBtn').disabled = true;
+  document.getElementById('loadingOverlay').classList.add('show');
+
+  const payload = {
+    timestamp: new Date().toISOString(),
+    type: currentType, department: currentDept, ratings,
+    comment: document.getElementById('commentInput').value.trim(),
+    avgScore: (Object.values(ratings).reduce((a,b)=>a+b,0)/Object.values(ratings).length).toFixed(2)
+  };
+
+  try {
+    await fetch(APPS_SCRIPT_URL, { method:'POST', mode:'no-cors', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload) });
+  } catch(e) {}
+  showSuccess();
+}
+
+function showSuccess() {
+  document.getElementById('loadingOverlay').classList.remove('show');
+  document.getElementById('formSection').style.display = 'none';
+  const s = document.getElementById('successScreen');
+  s.style.display = 'block';
+  setTimeout(() => s.classList.add('show'), 10);
+}
+
+function resetForm() {
+  ratings = {}; currentDept = ''; currentType = 'care';
+  document.getElementById('commentInput').value = '';
+  document.getElementById('formSection').style.display = 'block';
+  document.getElementById('successScreen').style.display = 'none';
+  document.getElementById('successScreen').classList.remove('show');
+  document.getElementById('submitBtn').disabled = false;
+  selectType('care');
+}
+
+// =====================================================
+//  PASSWORD GATE
+// =====================================================
+function showPwGate() {
+  document.getElementById('pwInput').value = '';
+  document.getElementById('pwError').textContent = '';
+  document.getElementById('pwInput').classList.remove('error');
+  document.getElementById('pwOverlay').classList.add('show');
+  setTimeout(() => document.getElementById('pwInput').focus(), 100);
+}
+
+function hidePwGate() {
+  document.getElementById('pwOverlay').classList.remove('show');
+}
+
+function checkPassword() {
+  const entered = document.getElementById('pwInput').value;
+  const saved = localStorage.getItem('kcph_admin_pw') || DEFAULT_PASSWORD;
+  if (entered === saved) {
+    hidePwGate();
+    openAdmin();
+  } else {
+    document.getElementById('pwError').textContent = '❌ លេខសម្ងាត់មិនត្រឹមត្រូវ / Incorrect password';
+    const input = document.getElementById('pwInput');
+    input.classList.add('error');
+    input.value = '';
+    setTimeout(() => input.classList.remove('error'), 500);
+    input.focus();
+  }
+}
+
+// =====================================================
+//  ADMIN NAVIGATION
+// =====================================================
+function openAdmin() {
+  document.getElementById('feedbackPage').classList.remove('active');
+  document.getElementById('adminPage').classList.add('active');
+  document.getElementById('adminPage').style.display = 'flex';
+  refreshData();
+}
+
+function adminLogout() {
+  document.getElementById('adminPage').classList.remove('active');
+  document.getElementById('adminPage').style.display = 'none';
+  document.getElementById('feedbackPage').classList.add('active');
+}
+
+const adminSections = ['overview','charts','departments','config','setup'];
+function showAdminSection(name) {
+  adminSections.forEach(s => {
+    const el = document.getElementById('asec-'+s);
+    if (el) el.style.display = s===name ? 'block' : 'none';
+  });
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  event.currentTarget && event.currentTarget.classList && event.currentTarget.classList.add('active');
+
+  const titles = { overview:'Overview Dashboard', charts:'Charts & Trends', departments:'Department Summary', config:'Configuration', setup:'Apps Script Setup' };
+  document.getElementById('adminPageTitle').textContent = titles[name] || name;
+
+  if (name==='departments') buildDeptTable(allData);
+  if (name==='charts') setTimeout(()=>{ buildWeeklyRunChart(allData); buildCompareBar(allData); buildVolumeBar(allData); }, 80);
+}
+
+// =====================================================
+//  ADMIN CHARTS
+// =====================================================
+let allData = [];
+let charts = {};
+function dc(id) { if (charts[id]) { charts[id].destroy(); delete charts[id]; } }
+
+function buildRunChart(data) {
+  dc('runChart');
+  const ctx = document.getElementById('runChart'); if(!ctx) return;
+  const byDate = {};
+  data.forEach(r => { const d=new Date(r.timestamp).toISOString().slice(0,10); if(!byDate[d]) byDate[d]=[]; byDate[d].push(r.avgScore); });
+  const dates = Object.keys(byDate).sort().slice(-30);
+  const avgs = dates.map(d=>(byDate[d].reduce((a,b)=>a+b,0)/byDate[d].length).toFixed(2));
+  const ma = avgs.map((v,i,arr)=>{ const sl=arr.slice(Math.max(0,i-6),i+1); return (sl.reduce((a,b)=>a+parseFloat(b),0)/sl.length).toFixed(2); });
+  charts['runChart'] = new Chart(ctx, {
+    type:'line',
+    data:{ labels:dates.map(d=>d.slice(5)), datasets:[
+      { label:'Daily Avg', data:avgs, borderColor:'#2980b9', backgroundColor:'rgba(41,128,185,0.08)', fill:true, tension:0.4, pointRadius:3, borderWidth:2 },
+      { label:'7-Day MA', data:ma, borderColor:'#e8a020', borderWidth:2.5, pointRadius:0, borderDash:[6,3], fill:false, tension:0.4 }
+    ]},
+    options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{position:'top'}, tooltip:{mode:'index',intersect:false} },
+      scales:{ y:{min:1,max:5,ticks:{callback:v=>v+'★'},grid:{color:'rgba(0,0,0,0.05)'}}, x:{grid:{display:false}} } }
+  });
+}
+
+function buildCategoryBar(data) {
+  dc('categoryBar');
+  const ctx = document.getElementById('categoryBar'); if(!ctx) return;
+  const labels = ['Care\nDelivery','Waiting\nTime','Counseling','Env\nSanitation','Hospitality','WC\nSanitation'];
+  const vals = [4.1,3.6,4.0,3.8,4.3,3.5];
+  charts['categoryBar'] = new Chart(ctx, {
+    type:'bar',
+    data:{ labels, datasets:[{ label:'Avg Score', data:vals, backgroundColor:vals.map(v=>v>=4?'rgba(39,174,96,0.7)':v>=3?'rgba(41,128,185,0.7)':'rgba(231,76,60,0.7)'), borderRadius:8, borderWidth:0 }] },
+    options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{ y:{min:0,max:5,ticks:{callback:v=>v+'★'},grid:{color:'rgba(0,0,0,0.05)'}}, x:{grid:{display:false}} } }
+  });
+}
+
+function buildDeptBar(data) {
+  dc('deptBar');
+  const ctx = document.getElementById('deptBar'); if(!ctx) return;
+  const byDept = {};
+  data.forEach(r=>{ if(!byDept[r.department]) byDept[r.department]=[]; byDept[r.department].push(r.avgScore); });
+  const sorted = Object.entries(byDept).map(([k,v])=>({dept:k,avg:v.reduce((a,b)=>a+b,0)/v.length})).sort((a,b)=>b.avg-a.avg).slice(0,10);
+  charts['deptBar'] = new Chart(ctx, {
+    type:'bar',
+    data:{ labels:sorted.map(d=>d.dept), datasets:[{ label:'Avg Score', data:sorted.map(d=>d.avg.toFixed(2)), backgroundColor:'rgba(26,95,138,0.7)', borderRadius:8, borderWidth:0 }] },
+    options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{ x:{min:0,max:5,ticks:{callback:v=>v+'★'}}, y:{grid:{display:false},ticks:{font:{size:10}}} } }
+  });
+}
+
+function buildDoughnut(data) {
+  dc('distDoughnut');
+  const ctx = document.getElementById('distDoughnut'); if(!ctx) return;
+  const dist=[0,0,0,0,0];
+  data.forEach(r=>{ const idx=Math.round(r.avgScore)-1; if(idx>=0&&idx<5) dist[idx]++; });
+  charts['distDoughnut'] = new Chart(ctx, {
+    type:'doughnut',
+    data:{ labels:['1★ ខ្សោយ','2★ ចាំបាច់កែ','3★ ល្អ','4★ ល្អណាស់','5★ ល្អឥតខ្ចោះ'], datasets:[{ data:dist, backgroundColor:['#e74c3c','#f39c12','#f1c40f','#27ae60','#2980b9'], borderWidth:0 }] },
+    options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{position:'right',labels:{font:{size:10},padding:8}} }, cutout:'65%' }
+  });
+}
+
+function buildMonthlyTrend(data) {
+  dc('monthlyTrend');
+  const ctx = document.getElementById('monthlyTrend'); if(!ctx) return;
+  const byMonth={};
+  data.forEach(r=>{ const m=new Date(r.timestamp).toISOString().slice(0,7); if(!byMonth[m]) byMonth[m]={scores:[],count:0}; byMonth[m].scores.push(r.avgScore); byMonth[m].count++; });
+  const months=Object.keys(byMonth).sort();
+  charts['monthlyTrend'] = new Chart(ctx, {
+    type:'bar',
+    data:{ labels:months, datasets:[
+      { type:'bar', label:'Count', data:months.map(m=>byMonth[m].count), backgroundColor:'rgba(41,128,185,0.3)', borderRadius:6, yAxisID:'y1' },
+      { type:'line', label:'Avg Score', data:months.map(m=>(byMonth[m].scores.reduce((a,b)=>a+b,0)/byMonth[m].scores.length).toFixed(2)), borderColor:'#e8a020', borderWidth:2.5, pointRadius:4, fill:false, yAxisID:'y', tension:0.4 }
+    ]},
+    options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{position:'top'}}, scales:{ y:{min:0,max:5,position:'left',ticks:{callback:v=>v+'★'}}, y1:{position:'right',grid:{display:false}} } }
+  });
+}
+
+function buildWeeklyRunChart(data) {
+  dc('weeklyRunChart');
+  const ctx = document.getElementById('weeklyRunChart'); if(!ctx) return;
+  const byWeek={};
+  data.forEach(r=>{ const d=new Date(r.timestamp); const w=`W${getWeekNum(d)} ${d.getFullYear()}`; if(!byWeek[w]) byWeek[w]=[]; byWeek[w].push(r.avgScore); });
+  const weeks=Object.keys(byWeek).slice(-16);
+  const avgs=weeks.map(w=>(byWeek[w].reduce((a,b)=>a+b,0)/byWeek[w].length).toFixed(2));
+  charts['weeklyRunChart'] = new Chart(ctx, {
+    type:'line',
+    data:{ labels:weeks, datasets:[
+      { label:'Weekly Avg', data:avgs, borderColor:'#1a5f8a', backgroundColor:'rgba(26,95,138,0.07)', fill:true, tension:0.4, pointRadius:5, borderWidth:2.5 },
+      { label:'Count', data:weeks.map(w=>byWeek[w].length), borderColor:'#e8a020', borderWidth:2, pointRadius:3, fill:false, tension:0.4, yAxisID:'y1', borderDash:[4,3] }
+    ]},
+    options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{position:'top'},tooltip:{mode:'index',intersect:false}},
+      scales:{ y:{min:1,max:5,position:'left',ticks:{callback:v=>v+'★'}}, y1:{position:'right',grid:{display:false}}, x:{grid:{display:false}} } }
+  });
+}
+
+function getWeekNum(d) { const j=new Date(d.getFullYear(),0,1); return Math.ceil(((d-j)/86400000+j.getDay()+1)/7); }
+
+function buildCompareBar(data) {
+  dc('compareBar');
+  const ctx=document.getElementById('compareBar'); if(!ctx) return;
+  const care=data.filter(d=>d.type==='care').map(d=>d.avgScore);
+  const supp=data.filter(d=>d.type==='support').map(d=>d.avgScore);
+  const cAvg=care.length?(care.reduce((a,b)=>a+b,0)/care.length).toFixed(2):0;
+  const sAvg=supp.length?(supp.reduce((a,b)=>a+b,0)/supp.length).toFixed(2):0;
+  charts['compareBar']=new Chart(ctx,{ type:'bar', data:{ labels:['Care Delivery 🩺','Support Service 🔬'], datasets:[{ label:'Avg Score', data:[cAvg,sAvg], backgroundColor:['rgba(26,95,138,0.75)','rgba(232,160,32,0.75)'], borderRadius:12, borderWidth:0 }] },
+    options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{ y:{min:0,max:5,ticks:{callback:v=>v+'★'}}, x:{grid:{display:false}} } } });
+}
+
+function buildVolumeBar(data) {
+  dc('volumeBar');
+  const ctx=document.getElementById('volumeBar'); if(!ctx) return;
+  const bm={};
+  data.forEach(r=>{ const m=new Date(r.timestamp).toISOString().slice(0,7); if(!bm[m]) bm[m]=0; bm[m]++; });
+  const months=Object.keys(bm).sort();
+  charts['volumeBar']=new Chart(ctx,{ type:'bar', data:{ labels:months, datasets:[{ label:'Count', data:months.map(m=>bm[m]), backgroundColor:'rgba(26,95,138,0.7)', borderRadius:8, borderWidth:0 }] },
+    options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{ y:{beginAtZero:true}, x:{grid:{display:false}} } } });
+}
+
+function buildDeptTable(data) {
+  const byDept={};
+  data.forEach(r=>{ if(!byDept[r.department]) byDept[r.department]={scores:[],type:r.type}; byDept[r.department].scores.push(r.avgScore); });
+  const tbody=document.getElementById('deptTableBody'); if(!tbody) return;
+  tbody.innerHTML='';
+  Object.entries(byDept).sort((a,b)=>{ const aa=a[1].scores.reduce((x,y)=>x+y,0)/a[1].scores.length; const bb=b[1].scores.reduce((x,y)=>x+y,0)/b[1].scores.length; return bb-aa; })
+  .forEach(([dept,info],i)=>{
+    const avg=info.scores.reduce((a,b)=>a+b,0)/info.scores.length;
+    const sc=avg>=4.5?'score-5':avg>=3.5?'score-4':avg>=2.5?'score-3':'score-2';
+    const stars='★'.repeat(Math.round(avg))+'☆'.repeat(5-Math.round(avg));
+    tbody.innerHTML+=`<tr><td>${i+1}</td><td><strong>${dept}</strong></td><td><span class="dept-badge">${info.type==='care'?'🩺 Care':'🔬 Support'}</span></td><td>${info.scores.length}</td><td><span class="score-badge ${sc}">${avg.toFixed(2)}</span></td><td><span class="mini-stars">${stars}</span></td><td><div class="progress-bar"><div class="progress-fill" style="width:${(avg/5*100).toFixed(0)}%"></div></div></td></tr>`;
+  });
+}
+
+function updateKPIs(data) {
+  const total=data.length;
+  const avg=total?(data.reduce((a,b)=>a+b.avgScore,0)/total).toFixed(2):0;
+  const sat=total?Math.round(data.filter(d=>d.avgScore>=4).length/total*100):0;
+  const poor=total?Math.round(data.filter(d=>d.avgScore<=2).length/total*100):0;
+  document.getElementById('kpi-total').textContent=total;
+  document.getElementById('kpi-avg').textContent=avg;
+  document.getElementById('kpi-satisfied').textContent=sat+'%';
+  document.getElementById('kpi-poor').textContent=poor+'%';
+}
+
+function generateDemoData(days) {
+  const depts=['OPD','Emergency','ICU','General Medicine','Gynecology','Maternity','Pediatry','Laboratory','Pharmacy','Radiology','Ultrasound','PMRS'];
+  const data=[];
+  const now=new Date();
+  for(let i=0;i<Math.min(days*8,600);i++){
+    const d=new Date(now); d.setDate(d.getDate()-Math.floor(Math.random()*days));
+    data.push({ timestamp:d.toISOString(), department:depts[Math.floor(Math.random()*depts.length)], type:Math.random()>0.5?'care':'support', avgScore:parseFloat((Math.random()*2+3).toFixed(2)) });
+  }
+  return data;
+}
+
+async function refreshData() {
+  const days=parseInt(document.getElementById('periodFilter').value);
+  const df=document.getElementById('deptFilter').value;
+  const scriptUrl=localStorage.getItem('kcph_script_url');
+  let data=[];
+  if(scriptUrl&&scriptUrl.includes('script.google.com')){
+    try {
+      const res=await fetch(scriptUrl);
+      const raw=await res.json();
+      data=raw.map(r=>({ timestamp:r['Timestamp']||r.timestamp, department:r['Department']||r.department, type:r['Type']||r.type, avgScore:parseFloat(r['Avg Score']||r.avgScore||3.5) })).filter(r=>r.timestamp);
+    } catch { data=generateDemoData(days); }
+  } else { data=generateDemoData(days); }
+  const cutoff=new Date(); cutoff.setDate(cutoff.getDate()-days);
+  data=data.filter(r=>new Date(r.timestamp)>=cutoff);
+  if(df!=='all') data=data.filter(r=>r.department===df);
+  allData=data;
+  updateKPIs(data);
+  setTimeout(()=>{ buildRunChart(data); buildCategoryBar(data); buildDeptBar(data); buildDoughnut(data); buildMonthlyTrend(data); },50);
+}
+
+function exportReport(period) {
+  const labels={weekly:'Weekly',monthly:'Monthly',quarterly:'Quarterly',annual:'Annual'};
+  document.getElementById('exportModalText').textContent=`Generating ${labels[period]} report for KCPH Patient Satisfaction`;
+  document.getElementById('exportModal').classList.add('show');
+}
+
+function exportCSV() {
+  const headers=['Timestamp','Type','Department','Avg Score'];
+  const rows=allData.map(r=>[new Date(r.timestamp).toLocaleString(),r.type,r.department,r.avgScore]);
+  const csv=[headers,...rows].map(r=>r.join(',')).join('\n');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download=`KCPH_Feedback_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+}
+
+function saveConfig() {
+  const url=document.getElementById('configScriptUrl').value;
+  const pw=document.getElementById('configPassword').value;
+  if(url) localStorage.setItem('kcph_script_url',url);
+  if(pw) localStorage.setItem('kcph_admin_pw',pw);
+  alert('✅ Configuration saved!');
+  if(url) refreshData();
+}
+
+function copySetupCode() {
+  navigator.clipboard.writeText(document.getElementById('appsScriptCode').textContent)
+    .then(()=>alert('✅ Code copied to clipboard!'));
+}
+
+init();
+</script>
+</body>
+</html>
